@@ -105,7 +105,6 @@ echo "Image:    ${image_path}" >&2
 
 exec env -u LD_PRELOAD apptainer exec \
     --fakeroot \
-    --writable-tmpfs \
     --pwd /tmp \
     --bind "${HOST_TMP_ROOT}:/data/tmp" \
     --bind /tmp/.X11-unix:/tmp/.X11-unix \
