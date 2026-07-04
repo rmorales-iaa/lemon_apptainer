@@ -22,7 +22,7 @@ set -euo pipefail
 #             /home/rafa/apps/lemon/lemon_apptainer/data path
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=lemon-juicer_sequential.sif
+APP_IMAGE=./lemon-juicer_sequential.sif
 
 usage() {
     cat <<'EOF'

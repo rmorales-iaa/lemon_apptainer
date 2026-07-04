@@ -37,7 +37,7 @@ set -euo pipefail
 #                 container. Defaults to /data/tmp/lemon-mosaic-work
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=lemon-juicer_sequential.sif
+APP_IMAGE=./lemon-juicer_sequential.sif
 
 usage() {
     cat <<'EOF'
