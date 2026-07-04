@@ -9,8 +9,12 @@ Apptainer build and run helpers for [LEMON](https://github.com/vterron/lemon), i
 - `run_lemon.bash`
   Runs the complete reduction pipeline for one dataset:
   `mosaic -> photometry -> diffphot`
+- `run_lemon_sequential.bash`
+  Runs the same reduction pipeline with the sequential image and serial mosaic mode.
 - `run_juicer.bash`
   Opens Juicer on the generated `curves.LEMONdB` database.
+- `run_juicer_sequential.bash`
+  Opens Juicer explicitly with the sequential image.
 
 ## Requirements
 
@@ -100,6 +104,28 @@ Run with defaults:
 ./run_lemon.bash
 ```
 
+Run explicitly in sequential mode:
+
+```bash
+./run_lemon_sequential.bash
+./run_lemon_sequential.bash HAT-P-32
+./run_lemon_sequential.bash HAT-P-32 mosaic
+```
+
+Run a different object:
+
+```bash
+./run_lemon.bash HAT-P-32
+```
+
+Run only one stage:
+
+```bash
+./run_lemon.bash mosaic
+./run_lemon.bash HAT-P-32 photometry
+./run_lemon.bash HAT-P-32 diffphot
+```
+
 Control mosaic parallelism:
 
 ```bash
@@ -111,6 +137,18 @@ Useful variables:
 - `OBJECT` dataset name, default `HAT-P-16`
 - `ROOT_DIR` data root
 - `MOSAIC_CORES` passed to `lemon mosaic --cores`, default `4`
+
+Positional arguments:
+
+- first argument: optional object name
+- second argument: optional stage, one of `mosaic`, `photometry`, `diffphot`
+- if only one argument is given and it is one of those stage names, it is treated as the stage
+- if no stage is given, the full pipeline runs
+
+Sequential pipeline notes:
+
+- `run_lemon_sequential.bash` uses `lemon-juicer_sequential.sif`
+- it always runs `lemon mosaic` with `--cores 1`
 
 This produces:
 
@@ -132,6 +170,19 @@ After `curves.LEMONdB` exists, launch Juicer with:
 ./run_juicer.bash
 ```
 
+Launch Juicer explicitly with the sequential image:
+
+```bash
+./run_juicer_sequential.bash
+./run_juicer_sequential.bash HAT-P-32
+```
+
+Launch Juicer for a different object:
+
+```bash
+./run_juicer.bash HAT-P-32
+```
+
 Useful variables:
 
 - `OBJECT` dataset name, default `HAT-P-16`
@@ -145,12 +196,20 @@ Juicer requires:
 
 ## Image Override
 
-Both runner scripts use `lemon-juicer.sif` in the same directory by default.
-You can override that with `LEMON_IMAGE`:
+The launchers use these default images from the same directory:
+
+- `run_lemon.bash` -> `lemon-juicer.sif`
+- `run_lemon_sequential.bash` -> `lemon-juicer_sequential.sif`
+- `run_juicer.bash` -> `lemon-juicer_sequential.sif`
+- `run_juicer_sequential.bash` -> `lemon-juicer_sequential.sif`
+
+You can override any of them with `LEMON_IMAGE`:
 
 ```bash
 LEMON_IMAGE=/path/to/custom.sif ./run_lemon.bash
+LEMON_IMAGE=/path/to/custom.sif ./run_lemon_sequential.bash
 LEMON_IMAGE=/path/to/custom.sif ./run_juicer.bash
+LEMON_IMAGE=/path/to/custom.sif ./run_juicer_sequential.bash
 ```
 
 ## Notes

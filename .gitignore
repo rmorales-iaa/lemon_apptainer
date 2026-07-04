@@ -1,0 +1,8 @@
+*.sif
+tmp/
+build-temp-*/
+data/
+*.log
+*.tmp
+*.swp
+.DS_Store
