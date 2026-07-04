@@ -75,6 +75,7 @@ fi
 INPUT_DIR="$ROOT_DIR/$INPUT_BASE/$OBJECT"
 OUTPUT_DIR="$ROOT_DIR/$OUTPUT_BASE/$OBJECT"
 mkdir -p "${HOST_TMP_ROOT}"
+mkdir -p "${HOST_TMP_ROOT}/lemon-iraf-home/.local/share"
 
 default_image_path="${script_dir}/$APP_IMAGE"
 fallback_image_path="${script_dir}/lemon-juicer-test.sif"
@@ -108,18 +109,11 @@ exec env -u LD_PRELOAD apptainer exec \
     --pwd /tmp \
     --bind "${HOST_TMP_ROOT}:/data/tmp" \
     --bind /tmp/.X11-unix:/tmp/.X11-unix \
-    --bind "${INPUT_DIR}:/data/in" \
     --bind "${OUTPUT_DIR}:/data/out" \
     --env DISPLAY="${DISPLAY}" \
     --env TMPDIR=/data/tmp \
     --env TEMP=/data/tmp \
     --env TMP=/data/tmp \
+    --env HOME=/data/tmp/lemon-iraf-home \
     "${image_path}" \
-    bash -lc '
-        export HOME=/data/tmp/lemon-iraf-home
-        export TMPDIR=/data/tmp
-        export TEMP=/data/tmp
-        export TMP=/data/tmp
-        mkdir -p "$HOME/.local/share"
-        juicer /data/out/curves.LEMONdB
-    '
+    /usr/local/bin/juicer /data/out/curves.LEMONdB
