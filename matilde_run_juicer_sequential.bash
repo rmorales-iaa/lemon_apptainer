@@ -76,6 +76,9 @@ INPUT_DIR="$ROOT_DIR/$INPUT_BASE/$OBJECT"
 OUTPUT_DIR="$ROOT_DIR/$OUTPUT_BASE/$OBJECT"
 mkdir -p "${HOST_TMP_ROOT}"
 mkdir -p "${HOST_TMP_ROOT}/lemon-iraf-home/.local/share"
+mkdir -p "${HOST_TMP_ROOT}/lemon-iraf/home"
+mkdir -p "${HOST_TMP_ROOT}/matplotlib"
+mkdir -p "${HOST_TMP_ROOT}/cache"
 
 default_image_path="${script_dir}/$APP_IMAGE"
 fallback_image_path="${script_dir}/lemon-juicer-test.sif"
@@ -111,9 +114,11 @@ exec env -u LD_PRELOAD apptainer exec \
     --bind /tmp/.X11-unix:/tmp/.X11-unix \
     --bind "${OUTPUT_DIR}:/data/out" \
     --env DISPLAY="${DISPLAY}" \
+    --env LEMON_IRAF_RUNTIME=/data/tmp/lemon-iraf \
+    --env MPLCONFIGDIR=/data/tmp/matplotlib \
     --env TMPDIR=/data/tmp \
     --env TEMP=/data/tmp \
     --env TMP=/data/tmp \
-    --env HOME=/data/tmp/lemon-iraf-home \
+    --env XDG_CACHE_HOME=/data/tmp/cache \
     "${image_path}" \
     /usr/local/bin/juicer /data/out/curves.LEMONdB
