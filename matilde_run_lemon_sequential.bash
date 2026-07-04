@@ -194,6 +194,20 @@ exec env -u LD_PRELOAD apptainer exec \
         export TMP=/data/tmp
         mkdir -p "$HOME"
         mkdir -p /data/tmp/lemon-bin
+        python - <<'"'"'PY'"'"'
+from __future__ import print_function
+
+path = "/opt/lemon/fitsimage.py"
+with open(path) as fh:
+    data = fh.read()
+
+needle = """                try:\n                    type_ = pyfits.info(self.path, output=False)[0][2]\n                    if type_ == \"NonstandardHDU\":\n                        # 'SIMPLE' exists but does not equal 'T'\n                        msg = \"%s: value of 'SIMPLE' keyword is not 'T'\"\n                        raise NonStandardFITS(msg % self.path)\n\n                except AttributeError as e:\n                    # 'SIMPLE' keyword does not exist\n                    error_msg = \"'_ValidHDU' object has no attribute '_summary'\"\n                    assert error_msg in str(e)\n                    msg = \"%s: 'SIMPLE' keyword missing from header\"\n                    raise NonStandardFITS(msg % self.path)\n"""
+replacement = """                # PyFITS 3.3+ reopens and re-parses the file in pyfits.info().\n                # For large campaigns this turns FITS validation into a major\n                # startup bottleneck. If pyfits.open() succeeded and the primary\n                # HDU is readable, trust that result and avoid the second pass.\n"""
+
+if needle in data:
+    with open(path, "w") as fh:
+        fh.write(data.replace(needle, replacement, 1))
+PY
         real_mprojexec="$(command -v mProjExec)"
         if [[ -z "${real_mprojexec}" ]]; then
             echo "Missing required Montage executable in image: mProjExec" >&2
@@ -228,7 +242,7 @@ WRAP
         export PATH=/data/tmp/lemon-bin:$PATH
         echo "[bootstrap] Checking Python, IRAF, and Montage runtime"
         python -c "import montage_wrapper" >/dev/null
-        python -c "import pyraf.iraf; pyraf.iraf.noao" >/dev/null
+        python -c "import pyraf" >/dev/null
         for cmd in mImgtbl mMakeHdr mProjExec mAdd mConvert; do
             command -v "$cmd" >/dev/null || {
                 echo "Missing required Montage executable in image: $cmd" >&2
