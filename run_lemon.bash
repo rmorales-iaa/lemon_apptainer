@@ -38,7 +38,7 @@ set -euo pipefail
 #                 container. Defaults to /data/tmp/lemon-mosaic-work
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=lemon-juicer.sif
+APP_IMAGE=/mnt/uxmal_groups/common_data/apps/lemon_apptainer_images/lemon-juicer.sif
 
 usage() {
     cat <<'EOF'
@@ -124,7 +124,7 @@ MOSAIC_FILE="$OUTPUT_DIR/mosaic.fits"
 PHOT_DB="$OUTPUT_DIR/phot.LEMONdB"
 CURVES_DB="$OUTPUT_DIR/curves.LEMONdB"
 
-default_image_path="${script_dir}/$APP_IMAGE"
+default_image_path="$APP_IMAGE"
 fallback_image_path="${script_dir}/lemon-juicer-test.sif"
 image_path="${LEMON_IMAGE:-$default_image_path}"
 
@@ -171,7 +171,6 @@ exec env -u LD_PRELOAD apptainer exec \
     --fakeroot \
     --writable-tmpfs \
     --pwd /tmp \
-    --bind "${script_dir}:/opt/host-lemon-runner" \
     --bind "${HOST_TMP_ROOT}:/data/tmp" \
     --bind "${INPUT_DIR}:/data/in" \
     --bind "${OUTPUT_DIR}:/data/out" \
@@ -180,12 +179,13 @@ exec env -u LD_PRELOAD apptainer exec \
     --env LEMON_MPROJEXEC_DEBUG="${LEMON_MPROJEXEC_DEBUG}" \
     --env LEMON_MPROJEXEC_STATUS="${LEMON_MPROJEXEC_STATUS}" \
     --env LEMON_MOSAIC_WORKROOT="${LEMON_MOSAIC_WORKROOT}" \
-    --env LEMON_MOSAIC_SKIP_PREFLIGHT=1 \
     --env LEMON_IRAF_RUNTIME=/data/tmp/lemon-iraf \
     --env PYRAF_NO_DISPLAY=1 \
     --env TMPDIR=/data/tmp \
     --env TEMP=/data/tmp \
     --env TMP=/data/tmp \
+    --env OMPI_MCA_btl=^openib \
+    --env OMPI_MCA_btl_base_warn_component_unused=0 \
     "${image_path}" \
     bash -lc '
         set -euo pipefail
@@ -193,7 +193,6 @@ exec env -u LD_PRELOAD apptainer exec \
         export PATH=/opt/lemon:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         export HOME=/data/tmp/lemon-iraf-home
         export LEMON_IRAF_RUNTIME=/data/tmp/lemon-iraf
-        export LEMON_MOSAIC_SKIP_PREFLIGHT=1
         export PYRAF_NO_DISPLAY=1
         export TMPDIR=/data/tmp
         export TEMP=/data/tmp
@@ -201,9 +200,10 @@ exec env -u LD_PRELOAD apptainer exec \
         export OMPI_ALLOW_RUN_AS_ROOT=1
         export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
         export OMPI_MCA_plm=isolated
+        export OMPI_MCA_btl=^openib
+        export OMPI_MCA_btl_base_warn_component_unused=0
         mkdir -p "$HOME"
         mkdir -p /data/tmp/lemon-bin
-        python /opt/host-lemon-runner/runtime_patch_lemon.py
         real_mprojexec="$(command -v mProjExec)"
         if [[ -z "${real_mprojexec}" ]]; then
             echo "Missing required Montage executable in image: mProjExec" >&2

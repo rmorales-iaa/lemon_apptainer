@@ -91,6 +91,8 @@ From: ubuntu:18.04
     export OMPI_ALLOW_RUN_AS_ROOT=1
     export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
     export OMPI_MCA_plm=isolated
+    export OMPI_MCA_btl=^openib
+    export OMPI_MCA_btl_base_warn_component_unused=0
     export PATH=/opt/lemon:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 %post
@@ -342,6 +344,8 @@ export HOME="\${runtime_root}/home"
 export OMPI_ALLOW_RUN_AS_ROOT="\${OMPI_ALLOW_RUN_AS_ROOT:-1}"
 export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="\${OMPI_ALLOW_RUN_AS_ROOT_CONFIRM:-1}"
 export OMPI_MCA_plm="\${OMPI_MCA_plm:-isolated}"
+export OMPI_MCA_btl="\${OMPI_MCA_btl:-^openib}"
+export OMPI_MCA_btl_base_warn_component_unused="\${OMPI_MCA_btl_base_warn_component_unused:-0}"
 export PYRAF_NO_DISPLAY="\${PYRAF_NO_DISPLAY:-1}"
 export LEMON_MPROJEXEC_DEBUG="\${LEMON_MPROJEXEC_DEBUG:-0}"
 export LEMON_MPROJEXEC_STATUS="\${LEMON_MPROJEXEC_STATUS:-}"
