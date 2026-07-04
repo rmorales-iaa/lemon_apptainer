@@ -171,6 +171,7 @@ exec env -u LD_PRELOAD apptainer exec \
     --fakeroot \
     --writable-tmpfs \
     --pwd /tmp \
+    --bind "${script_dir}:/opt/host-lemon-runner" \
     --bind "${HOST_TMP_ROOT}:/data/tmp" \
     --bind "${INPUT_DIR}:/data/in" \
     --bind "${OUTPUT_DIR}:/data/out" \
@@ -179,6 +180,7 @@ exec env -u LD_PRELOAD apptainer exec \
     --env LEMON_MPROJEXEC_DEBUG="${LEMON_MPROJEXEC_DEBUG}" \
     --env LEMON_MPROJEXEC_STATUS="${LEMON_MPROJEXEC_STATUS}" \
     --env LEMON_MOSAIC_WORKROOT="${LEMON_MOSAIC_WORKROOT}" \
+    --env LEMON_MOSAIC_SKIP_PREFLIGHT=1 \
     --env LEMON_IRAF_RUNTIME=/data/tmp/lemon-iraf \
     --env PYRAF_NO_DISPLAY=1 \
     --env TMPDIR=/data/tmp \
@@ -191,6 +193,7 @@ exec env -u LD_PRELOAD apptainer exec \
         export PATH=/opt/lemon:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         export HOME=/data/tmp/lemon-iraf-home
         export LEMON_IRAF_RUNTIME=/data/tmp/lemon-iraf
+        export LEMON_MOSAIC_SKIP_PREFLIGHT=1
         export PYRAF_NO_DISPLAY=1
         export TMPDIR=/data/tmp
         export TEMP=/data/tmp
@@ -200,20 +203,7 @@ exec env -u LD_PRELOAD apptainer exec \
         export OMPI_MCA_plm=isolated
         mkdir -p "$HOME"
         mkdir -p /data/tmp/lemon-bin
-        python - <<'"'"'PY'"'"'
-from __future__ import print_function
-
-path = "/opt/lemon/fitsimage.py"
-with open(path) as fh:
-    data = fh.read()
-
-needle = """                try:\n                    type_ = pyfits.info(self.path, output=False)[0][2]\n                    if type_ == \"NonstandardHDU\":\n                        # 'SIMPLE' exists but does not equal 'T'\n                        msg = \"%s: value of 'SIMPLE' keyword is not 'T'\"\n                        raise NonStandardFITS(msg % self.path)\n\n                except AttributeError as e:\n                    # 'SIMPLE' keyword does not exist\n                    error_msg = \"'_ValidHDU' object has no attribute '_summary'\"\n                    assert error_msg in str(e)\n                    msg = \"%s: 'SIMPLE' keyword missing from header\"\n                    raise NonStandardFITS(msg % self.path)\n"""
-replacement = """                # PyFITS 3.3+ reopens and re-parses the file in pyfits.info().\n                # For large campaigns this turns FITS validation into a major\n                # startup bottleneck. If pyfits.open() succeeded and the primary\n                # HDU is readable, trust that result and avoid the second pass.\n"""
-
-if needle in data:
-    with open(path, "w") as fh:
-        fh.write(data.replace(needle, replacement, 1))
-PY
+        python /opt/host-lemon-runner/runtime_patch_lemon.py
         real_mprojexec="$(command -v mProjExec)"
         if [[ -z "${real_mprojexec}" ]]; then
             echo "Missing required Montage executable in image: mProjExec" >&2
