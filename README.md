@@ -226,6 +226,10 @@ LEMON_IMAGE=/path/to/custom.sif ./run_juicer_sequential.bash
   - cause: Apptainer temporary build state is on NFS
   - fix: keep `WORK_ROOT`, `BUILD_TMP_ROOT`, and `BUILD_CACHE_ROOT` on local storage such as `/var/tmp`
 
+- `run_lemon.bash` appears to hang at startup
+  - cause: MPI initialization probe (`mpirun`) is slow or unresponsive
+  - fix: this is handled automatically with a 5-second timeout; if it still hangs, check MPI configuration or disable MPI entirely by setting `MOSAIC_CORES=1`
+
 - Juicer fails to start with display errors
   - confirm `DISPLAY` is set on the host
   - confirm `/tmp/.X11-unix` exists and is accessible

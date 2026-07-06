@@ -247,7 +247,7 @@ WRAP
         done
         mosaic_cores="${MOSAIC_CORES}"
         if command -v mpirun >/dev/null && command -v mProjExecMPI >/dev/null \
-           && mpirun -n 1 /bin/true >/dev/null 2>&1; then
+           && timeout 5 mpirun -n 1 /bin/true >/dev/null 2>&1; then
             echo "[bootstrap] MPI Montage support detected"
         else
             echo "[bootstrap] MPI Montage support not usable here; forcing serial mosaic mode"
