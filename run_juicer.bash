@@ -24,7 +24,7 @@ set -euo pipefail
 
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=/mnt/uxmal_groups/common_data/apps/lemon_apptainer_images/lemon-juicer.sif
+APP_IMAGE=./lemon-juicer.sif
 
 usage() {
     cat <<'EOF'
@@ -52,7 +52,7 @@ if [[ $# -gt 0 ]]; then
     exit 1
 fi
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+script_dir="./"
 default_root_dir="${script_dir}/data"
 legacy_root_dir="/home/rafa/apps/lemon/lemon_apptainer/data"
 HOST_TMP_ROOT="${script_dir}/tmp"
