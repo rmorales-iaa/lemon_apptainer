@@ -81,6 +81,18 @@ Example layout:
 
 ## Run The Pipeline
 
+## Important Performance Warning
+
+Processing a large number of images, or very large FITS images, requires a fast computer.
+
+- slow CPUs will make mosaic and photometry stages take much longer
+- limited RAM can make large runs unstable or very slow
+- slow disks can heavily delay temporary-file and output writes
+- for large datasets, expect much better results on a workstation or server than on a laptop
+- if performance is poor, try fewer images first before launching a full dataset
+
+This is especially important for datasets like `HAT-P-16`, where full runs can take a long time even when the scripts are working correctly.
+
 Run the default dataset:
 
 ```bash
