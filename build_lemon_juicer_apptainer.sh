@@ -21,8 +21,8 @@ set -euo pipefail
 # build state is placed on NFS.
 #
 # Example:
-#   ./build_lemon_apptainer.sh
-#   LEMON_REF=v0.4.4 ./build_lemon_apptainer.sh lemon-juicer.sif
+#   ./build_lemon_juicer_apptainer.sh
+#   LEMON_REF=v0.4.4 ./build_lemon_juicer_apptainer.sh lemon-juicer.sif
 
 IMAGE_NAME="${1:-lemon-juicer.sif}"
 LEMON_REF="${LEMON_REF:-master}"

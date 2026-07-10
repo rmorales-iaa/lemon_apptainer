@@ -18,13 +18,11 @@ set -euo pipefail
 #
 # Useful environment variables:
 #   OBJECT    Dataset name, default: HAT-P-16
-#   ROOT_DIR  Data root; defaults to ./data if present, otherwise the legacy
-#             /home/rafa/apps/lemon/lemon_apptainer/data path
+#   ROOT_DIR  Data root; defaults to <script_dir>/data
 #   LEMON_IMAGE  Override image path
 
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=./lemon-juicer.sif
 
 usage() {
     cat <<'EOF'
@@ -52,16 +50,12 @@ if [[ $# -gt 0 ]]; then
     exit 1
 fi
 
-script_dir="./"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 default_root_dir="${script_dir}/data"
-legacy_root_dir="/home/rafa/apps/lemon/lemon_apptainer/data"
+APP_IMAGE="${script_dir}/lemon-juicer.sif"
 HOST_TMP_ROOT="${script_dir}/tmp"
 if [[ -z "${ROOT_DIR:-}" ]]; then
-    if [[ -d "${default_root_dir}/out/${OBJECT}" || -d "${default_root_dir}/output/${OBJECT}" ]]; then
-        ROOT_DIR="${default_root_dir}"
-    else
-        ROOT_DIR="${legacy_root_dir}"
-    fi
+    ROOT_DIR="${default_root_dir}"
 else
     ROOT_DIR="${ROOT_DIR}"
 fi

@@ -63,8 +63,8 @@ $ROOT_DIR/output/$OBJECT/
 
 Default root selection:
 
-- use `./data` next to the scripts when that dataset exists there
-- otherwise fall back to `/home/rafa/apps/lemon/lemon_apptainer/data`
+- the launchers use `./data` under the script directory by default
+- set `ROOT_DIR` explicitly if your data lives elsewhere
 
 Example layout:
 
@@ -213,7 +213,7 @@ Juicer requires:
 
 ## Image Override
 
-The launchers use `/mnt/uxmal_groups/common_data/apps/lemon_apptainer_images/lemon-juicer.sif` by default.
+The launchers use `./lemon-juicer.sif` in the script directory by default.
 
 If that image is not present, both launchers fall back to `./lemon-juicer-test.sif` when available.
 

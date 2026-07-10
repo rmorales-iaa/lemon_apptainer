@@ -17,7 +17,7 @@ trap cleanup EXIT INT TERM
 
 # Usage / configuration
 #   OBJECT        Dataset name, default: HAT-P-16
-#   ROOT_DIR      Data root; defaults to ./data if present
+#   ROOT_DIR      Data root; defaults to <script_dir>/data
 #   MOSAIC_CORES  Number of cores, default: 4
 #   LEMON_TIMEOUT Overall execution timeout in seconds, default: 2400
 #   LEMON_IMAGE   Override image path
@@ -26,7 +26,6 @@ trap cleanup EXIT INT TERM
 #   LEMON_MOSAIC_WORKROOT  Montage temp work dir, default /data/tmp/lemon-mosaic-work
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=/mnt/uxmal_groups/common_data/apps/lemon_apptainer_images/lemon-juicer.sif
 
 usage() {
     cat <<'EOF'
@@ -60,7 +59,7 @@ fi
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 default_root_dir="${script_dir}/data"
-legacy_root_dir="/home/rafa/apps/lemon/lemon_apptainer/data"
+APP_IMAGE="${script_dir}/lemon-juicer.sif"
 MOSAIC_CORES="${MOSAIC_CORES:-4}"
 LEMON_MPROJEXEC_DEBUG="${LEMON_MPROJEXEC_DEBUG:-0}"
 HOST_TMP_ROOT="${script_dir}/tmp"
@@ -68,11 +67,7 @@ LEMON_MPROJEXEC_STATUS="${LEMON_MPROJEXEC_STATUS:-}"
 LEMON_MOSAIC_WORKROOT="${LEMON_MOSAIC_WORKROOT:-/data/tmp/lemon-mosaic-work}"
 LEMON_TIMEOUT="${LEMON_TIMEOUT:-2400}"
 if [[ -z "${ROOT_DIR:-}" ]]; then
-    if [[ -d "${default_root_dir}/in/${OBJECT}" || -d "${default_root_dir}/input/${OBJECT}" ]]; then
-        ROOT_DIR="${default_root_dir}"
-    else
-        ROOT_DIR="${legacy_root_dir}"
-    fi
+    ROOT_DIR="${default_root_dir}"
 else
     ROOT_DIR="${ROOT_DIR}"
 fi
