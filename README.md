@@ -132,11 +132,20 @@ Control mosaic parallelism:
 MOSAIC_CORES=8 ./run_lemon.bash
 ```
 
+Set execution timeout:
+
+```bash
+LEMON_TIMEOUT=2400 ./run_lemon.bash     # 40 minutes (default, recommended)
+LEMON_TIMEOUT=3000 ./run_lemon.bash     # 50 minutes (for extremely large datasets)
+LEMON_TIMEOUT=0 ./run_lemon.bash        # No timeout (unlimited)
+```
+
 Useful variables:
 
 - `OBJECT` dataset name, default `HAT-P-16`
 - `ROOT_DIR` data root
 - `MOSAIC_CORES` passed to `lemon mosaic --cores`, default `4`
+- `LEMON_TIMEOUT` execution timeout in seconds, default `2400` (40 minutes)
 
 Positional arguments:
 
@@ -229,6 +238,24 @@ LEMON_IMAGE=/path/to/custom.sif ./run_juicer_sequential.bash
 - `run_lemon.bash` appears to hang at startup
   - cause: MPI initialization probe (`mpirun`) is slow or unresponsive
   - fix: this is handled automatically with a 5-second timeout; if it still hangs, check MPI configuration or disable MPI entirely by setting `MOSAIC_CORES=1`
+
+- `run_lemon.bash HAT-P-16` produces no output (full 518-file dataset)
+  - cause: Processing time for 518 files (~1100+ seconds) may exceed timeout if reduced
+  - default 1800-second timeout should now work: `./run_lemon.bash HAT-P-16`
+  - if still needed, increase timeout: `LEMON_TIMEOUT=2400 ./run_lemon.bash HAT-P-16`
+  - or use serial mode (slower): `MOSAIC_CORES=1 ./run_lemon.bash HAT-P-16`
+  - processing times: 30 files (~30s), 50 files (~40s), 100 files (~60s), 150 files (~120s), 518 files (~1000-1200s)
+
+- `run_lemon.bash` times out during mosaic processing with large datasets
+  - cause: Processing time scales non-linearly with file count
+  - workaround 1: reduce dataset size by selecting a subset of frames
+  - workaround 2: increase timeout: `LEMON_TIMEOUT=1800 ./run_lemon.bash OBJECT mosaic`
+  - workaround 3: use serial mosaic mode: `MOSAIC_CORES=1 LEMON_TIMEOUT=1800 ./run_lemon.bash`
+  - note: orphaned `mpirun` processes are automatically cleaned up when the script exits
+
+- Stray `mpirun` processes consuming CPU
+  - cause: if previous runs were interrupted with SIGKILL, orphaned processes may remain
+  - fix: cleanup is now automatic, but manual cleanup can be done with `pkill -9 mpirun`
 
 - Juicer fails to start with display errors
   - confirm `DISPLAY` is set on the host

@@ -20,10 +20,11 @@ set -euo pipefail
 #   OBJECT    Dataset name, default: HAT-P-16
 #   ROOT_DIR  Data root; defaults to ./data if present, otherwise the legacy
 #             /home/rafa/apps/lemon/lemon_apptainer/data path
+#   LEMON_IMAGE  Override image path
 
 
 OBJECT="${OBJECT:-HAT-P-16}"
-APP_IMAGE=lemon-juicer.sif
+APP_IMAGE=/mnt/uxmal_groups/common_data/apps/lemon_apptainer_images/lemon-juicer.sif
 
 usage() {
     cat <<'EOF'
@@ -81,7 +82,7 @@ mkdir -p "${HOST_TMP_ROOT}/lemon-iraf/home"
 mkdir -p "${HOST_TMP_ROOT}/matplotlib"
 mkdir -p "${HOST_TMP_ROOT}/cache"
 
-default_image_path="${script_dir}/$APP_IMAGE"
+default_image_path="$APP_IMAGE"
 fallback_image_path="${script_dir}/lemon-juicer-test.sif"
 image_path="${LEMON_IMAGE:-$default_image_path}"
 
@@ -108,7 +109,9 @@ echo "Launching Juicer for ${OBJECT}" >&2
 echo "Database: ${OUTPUT_DIR}/curves.LEMONdB" >&2
 echo "Image:    ${image_path}" >&2
 
-exec env -u LD_PRELOAD apptainer exec \
+START_TIME=$(date +%s)
+
+env -u LD_PRELOAD apptainer exec \
     --fakeroot \
     --pwd /tmp \
     --bind "${HOST_TMP_ROOT}:/data/tmp" \
@@ -123,3 +126,9 @@ exec env -u LD_PRELOAD apptainer exec \
     --env XDG_CACHE_HOME=/data/tmp/cache \
     "${image_path}" \
     /usr/local/bin/juicer /data/out/curves.LEMONdB
+
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+echo "=== Juicer session ended ===" >&2
+echo "Object:      ${OBJECT}" >&2
+echo "Elapsed:     ${ELAPSED}s ($((ELAPSED / 60))m $((ELAPSED % 60))s)" >&2
