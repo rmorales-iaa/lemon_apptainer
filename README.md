@@ -137,19 +137,47 @@ $ROOT_DIR/out/$OBJECT/
 
 ## HAT-P-16 Example
 
-Run the full `HAT-P-16` pipeline from repo-local data:
+Command-by-command example for `HAT-P-16`:
+
+1. Check input data exists.
+
+```bash
+ls -lh ./data/in/HAT-P-16
+```
+
+2. Run full pipeline with current default timeout.
 
 ```bash
 ./run_lemon.bash HAT-P-16
 ```
 
-Run the same dataset with an explicit root and a longer timeout:
+3. If dataset is slow on your machine, run again with more time.
 
 ```bash
-ROOT_DIR=./data LEMON_TIMEOUT=3000 ./run_lemon.bash HAT-P-16
+LEMON_TIMEOUT=3000 ./run_lemon.bash HAT-P-16
 ```
 
-Open the resulting light-curve database in Juicer:
+4. If MPI causes trouble, force serial mosaic mode.
+
+```bash
+MOSAIC_CORES=1 LEMON_TIMEOUT=3000 ./run_lemon.bash HAT-P-16
+```
+
+5. Check output files.
+
+```bash
+ls -lh ./data/out/HAT-P-16
+```
+
+6. Run stages one by one if you want manual control.
+
+```bash
+./run_lemon.bash HAT-P-16 mosaic
+./run_lemon.bash HAT-P-16 photometry
+./run_lemon.bash HAT-P-16 diffphot
+```
+
+7. Open result in Juicer.
 
 ```bash
 ./run_juicer.bash HAT-P-16
