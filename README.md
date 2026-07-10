@@ -18,6 +18,24 @@ Apptainer build and run helpers for [LEMON](https://github.com/vterron/lemon), i
 - `fakeroot` support for unprivileged builds and runs
 - X11 available on the host for Juicer
 
+## HPC / Slurm Dependencies
+
+To run this image on an HPC cluster with Slurm, the cluster should provide:
+
+- `slurm` commands such as `sbatch`, `srun`, and `squeue`
+- `apptainer` installed on the compute nodes, not only on the login node
+- `fakeroot` or equivalent Apptainer user-namespace support on the compute nodes, because the launcher scripts use `--fakeroot`
+- a shared filesystem or staged local copy so the `.sif` image, input FITS files, and output directory are visible from the compute node
+- enough local scratch or fast temporary storage for `TMPDIR`, Apptainer temporary files, and LEMON working files
+- enough CPU, RAM, and disk I/O for the dataset size
+
+Recommended cluster setup:
+
+- store the image on shared storage or copy it into node-local scratch before running
+- keep input data readable from the compute node and write outputs to a filesystem with enough free space
+- prefer batch execution for `run_lemon.bash`
+- use `run_juicer.bash` only on nodes or sessions where X11 forwarding is available
+
 ## Build
 
 Build the default image:
