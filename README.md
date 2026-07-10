@@ -96,7 +96,7 @@ Run a different object:
 Run only one stage:
 
 ```bash
-./run_lemon.bash mosaic
+./run_lemon.bash HAT-P-32 mosaic
 ./run_lemon.bash HAT-P-32 photometry
 ./run_lemon.bash HAT-P-32 diffphot
 ```
